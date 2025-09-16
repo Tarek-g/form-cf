@@ -1,0 +1,23 @@
+{
+  "name": "form-cf",
+  "version": "1.0.0",
+  "description": "نظام استمارات بسيط ورخيص على Cloudflare Workers مع D1",
+  "main": "src/worker.ts",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "tail": "wrangler tail",
+    "db:create": "wrangler d1 create form_db",
+    "db:migrate": "wrangler d1 migrations apply form_db",
+    "db:console": "wrangler d1 execute form_db --command=\"SELECT * FROM submissions;\"",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": ["cloudflare", "workers", "forms", "d1", "arabic"],
+  "author": "Tarek",
+  "license": "MIT",
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20231218.0",
+    "typescript": "^5.3.3",
+    "wrangler": "^3.22.0"
+  }
+}

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نموذج تضمين بسيط - بدون JavaScript</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            background-color: #f8f9fa;
+        }
+        .form-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #34495e;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        .checkbox-group input {
+            width: auto;
+            margin: 0;
+        }
+        button {
+            background: #3498db;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        .note {
+            background: #e8f5e8;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #2d5a27;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>📝 نموذج التوقيع</h2>
+        
+        <!-- 
+            استبدل YOUR-WORKER-DOMAIN.workers.dev برابط الـ Worker الخاص بك
+            Replace YOUR-WORKER-DOMAIN.workers.dev with your actual Worker URL
+        -->
+        <form action="https://YOUR-WORKER-DOMAIN.workers.dev/api/submissions" 
+              method="post" 
+              accept-charset="utf-8">
+            
+            <div class="form-group">
+                <label for="name">الاسم الكامل *</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="org">المؤسسة أو الجهة (اختياري)</label>
+                <input type="text" id="org" name="org">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">البريد الإلكتروني *</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="comment">تعليق أو رسالة (اختياري)</label>
+                <textarea id="comment" name="comment" rows="4" 
+                          placeholder="شاركنا رأيك أو رسالتك..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="consent_public" name="consent_public" value="1">
+                    <label for="consent_public">
+                        أوافق على عرض اسمي وتعليقي في القائمة العامة للموقعين. 
+                        (بريدك الإلكتروني لن يظهر أبداً للعامة)
+                    </label>
+                </div>
+            </div>
+            
+            <button type="submit">إرسال التوقيع</button>
+        </form>
+        
+        <div class="note">
+            📌 <strong>ملاحظة:</strong> هذا النموذج يعمل بدون JavaScript. 
+            بعد الإرسال، ستتم إعادة توجيهك لصفحة تأكيد.
+        </div>
+    </div>
+</body>
+</html>
