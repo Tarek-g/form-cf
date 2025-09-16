@@ -6,8 +6,7 @@ compatibility_date = "2024-12-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "form_db"
-# database_id سيتم تحديثه بعد إنشاء قاعدة البيانات
-# database_id = "your-d1-database-id"
+database_id = "d00a4582-02b8-461e-9d96-7360f2f965de"
 
 [vars]
 # غير كلمة المرور هذه لشيء سري وقوي
