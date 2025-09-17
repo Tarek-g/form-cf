@@ -27,6 +27,26 @@
             
             this.render();
             this.bindEvents();
+            
+            // Load Turnstile script if not already loaded
+            if (!window.turnstile && !document.querySelector('script[src*="turnstile"]')) {
+                const script = document.createElement('script');
+                script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+                script.async = true;
+                script.defer = true;
+                document.head.appendChild(script);
+            }
+            
+            // Show Turnstile if site key is configured
+            setTimeout(() => {
+                const turnstileContainer = document.querySelector('#form-cf-turnstile-container');
+                const turnstileElement = document.querySelector('.cf-turnstile');
+                
+                if (turnstileContainer && turnstileElement && this.config.turnstileSiteKey) {
+                    turnstileElement.setAttribute('data-sitekey', this.config.turnstileSiteKey);
+                    turnstileContainer.style.display = 'block';
+                }
+            }, 500);
         },
         
         // Render the form HTML
@@ -182,6 +202,14 @@
                             </div>
                         </div>
                         
+                        <!-- Turnstile CAPTCHA -->
+                        <div class="form-cf-group" id="form-cf-turnstile-container" style="display: none;">
+                            <div class="cf-turnstile" 
+                                 data-sitekey="TURNSTILE_SITE_KEY" 
+                                 data-theme="${this.config.theme || 'light'}" 
+                                 data-language="${this.config.language || 'ar'}"></div>
+                        </div>
+                        
                         <button type="submit" class="form-cf-button">
                             <span class="button-text">${texts.submitButton}</span>
                         </button>
@@ -216,6 +244,15 @@
             try {
                 const formData = new FormData(form);
                 
+                // Add Turnstile token if available
+                const turnstileElement = document.querySelector('.cf-turnstile');
+                if (turnstileElement && window.turnstile) {
+                    const turnstileToken = window.turnstile.getResponse(turnstileElement);
+                    if (turnstileToken) {
+                        formData.append('cf-turnstile-response', turnstileToken);
+                    }
+                }
+                
                 const response = await fetch(`${this.config.apiUrl}/api/submissions`, {
                     method: 'POST',
                     body: formData
@@ -227,6 +264,12 @@
                     this.showMessage(result.message || this.getTexts(this.config.language).successMessage, 'success');
                     form.reset();
                     
+                    // Reset Turnstile if present
+                    const turnstileElement = document.querySelector('.cf-turnstile');
+                    if (turnstileElement && window.turnstile) {
+                        window.turnstile.reset(turnstileElement);
+                    }
+                    
                     // Trigger custom event
                     this.triggerEvent('formSubmitted', { result });
                 } else {
@@ -236,12 +279,24 @@
                     }
                     this.showMessage(errorMsg, 'error');
                     
+                    // Reset Turnstile on error
+                    const turnstileElement = document.querySelector('.cf-turnstile');
+                    if (turnstileElement && window.turnstile) {
+                        window.turnstile.reset(turnstileElement);
+                    }
+                    
                     // Trigger custom event
                     this.triggerEvent('formError', { result });
                 }
             } catch (error) {
                 console.error('FormCF submission error:', error);
                 this.showMessage(this.getTexts(this.config.language).networkError, 'error');
+                
+                // Reset Turnstile on error
+                const turnstileElement = document.querySelector('.cf-turnstile');
+                if (turnstileElement && window.turnstile) {
+                    window.turnstile.reset(turnstileElement);
+                }
                 
                 // Trigger custom event
                 this.triggerEvent('formError', { error });

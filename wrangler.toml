@@ -13,6 +13,11 @@ database_id = "d00a4582-02b8-461e-9d96-7360f2f965de"
 ADMIN_BEARER = "change_me_very_secret_admin_token_123"
 # أضف النطاقات المسموحة (فاصلة بينها)
 ALLOWED_ORIGINS = "https://alghorani.me,https://cihrs.org,http://localhost:3000"
+# إعداد Turnstile (اختياري) - احصل على المفاتيح من لوحة تحكم Cloudflare
+# TURNSTILE_SECRET_KEY = "your_turnstile_secret_key_here"
+# مفاتيح التشفير (مطلوبة) - لا تغيرها إلا إذا كنت تعرف ما تفعل
+ENC_KEY_B64 = "O7Nrr0qEe+4UznoAwa+9HzUbw20I86eAET2pZmLUJvg="
+ENC_KEY_ID = "default-key-2024"
 
 # إعدادات الإنتاج
 [env.production]

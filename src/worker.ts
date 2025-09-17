@@ -10,6 +10,7 @@ export interface Env {
   ENVIRONMENT?: string;
   ENC_KEY_B64: string;  // Base64 encoded AES-256 key
   ENC_KEY_ID: string;   // Key identifier for rotation
+  TURNSTILE_SECRET_KEY?: string;  // Cloudflare Turnstile secret key (optional)
 }
 
 interface FormValidationResult {
@@ -101,14 +102,42 @@ async function parseRequestBody(req: Request) {
     return await req.json();
   }
   
-  if (contentType.includes("application/x-www-form-urlencoded")) {
+  if (contentType.includes("application/x-www-form-urlencoded") || contentType.includes("multipart/form-data")) {
     const formData = await req.formData();
-    return Object.fromEntries(
-      [...formData.entries()].map(([k, v]) => [k, typeof v === "string" ? v : ""])
-    );
+    const result: Record<string, any> = {};
+    
+    for (const [key, value] of formData.entries()) {
+      if (typeof value === "string") {
+        result[key] = value;
+      } else {
+        // Handle File objects
+        result[key] = String(value);
+      }
+    }
+    
+    console.log('Parsed form data:', result);
+    return result;
   }
   
-  return {};
+  // Fallback: try to parse as form data anyway
+  try {
+    const formData = await req.formData();
+    const result: Record<string, any> = {};
+    
+    for (const [key, value] of formData.entries()) {
+      if (typeof value === "string") {
+        result[key] = value;
+      } else {
+        result[key] = String(value);
+      }
+    }
+    
+    console.log('Fallback parsed form data:', result);
+    return result;
+  } catch (error) {
+    console.error('Failed to parse request body:', error);
+    return {};
+  }
 }
 
 // Validation function
@@ -121,15 +150,32 @@ function validateSubmission(payload: any) {
   const comment = (payload.comment || "").toString().trim();
   const consent = String(payload.consent_public ?? "").toLowerCase();
   
-  // Validation rules
+  // Enhanced validation rules
   if (!name) {
     errors.name = "الاسم مطلوب";
   } else if (name.length < 2) {
     errors.name = "الاسم يجب أن يكون أكثر من حرف واحد";
+  } else if (name.length > 100) {
+    errors.name = "الاسم طويل جداً (الحد الأقصى 100 حرف)";
   }
   
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    errors.email = "بريد إلكتروني غير صالح";
+  // More comprehensive email validation
+  if (!email) {
+    errors.email = "البريد الإلكتروني مطلوب";
+  } else {
+    // Enhanced email regex that supports international domains
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const isValidFormat = emailRegex.test(email);
+    const hasValidLength = email.length >= 5 && email.length <= 254;
+    const hasValidParts = email.includes('@') && email.includes('.') && !email.startsWith('.') && !email.endsWith('.');
+    
+    if (!isValidFormat || !hasValidLength || !hasValidParts) {
+      errors.email = "بريد إلكتروني غير صالح";
+    }
+  }
+  
+  if (org && org.length > 200) {
+    errors.org = "اسم المؤسسة طويل جداً (الحد الأقصى 200 حرف)";
   }
   
   if (comment && comment.length > 1000) {
@@ -155,6 +201,33 @@ async function hashIP(ip: string): Promise<string> {
   return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
+// Cloudflare Turnstile verification
+async function verifyTurnstile(token: string, secretKey: string, remoteip?: string): Promise<boolean> {
+  if (!token || !secretKey) {
+    return false;
+  }
+  
+  try {
+    const formData = new FormData();
+    formData.append('secret', secretKey);
+    formData.append('response', token);
+    if (remoteip) {
+      formData.append('remoteip', remoteip);
+    }
+    
+    const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      body: formData
+    });
+    
+    const result = await response.json() as any;
+    return result.success === true;
+  } catch (error) {
+    console.error('Turnstile verification error:', error);
+    return false;
+  }
+}
+
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
@@ -168,14 +241,35 @@ export default {
     try {
       // POST /api/submissions - Submit a new form
       if (url.pathname === "/api/submissions" && request.method === "POST") {
-        const payload = await parseRequestBody(request);
-        const { ok, errors, data } = validateSubmission(payload);
+        try {
+          const payload = await parseRequestBody(request) as any;
+          console.log('Received payload:', JSON.stringify(payload, null, 2));
+          
+          const { ok, errors, data } = validateSubmission(payload);
+          console.log('Validation result:', { ok, errors, data });
+          
+          if (!ok) {
+            return jsonResponse(
+              { success: false, errors }, 
+              { status: 400, headers: corsHeaders }
+            );
+          }
         
-        if (!ok) {
-          return jsonResponse(
-            { success: false, errors }, 
-            { status: 400, headers: corsHeaders }
+        // Optional Turnstile verification
+        if (env.TURNSTILE_SECRET_KEY && payload['cf-turnstile-response']) {
+          const ip = request.headers.get("CF-Connecting-IP") || request.headers.get("X-Forwarded-For") || "";
+          const turnstileValid = await verifyTurnstile(
+            payload['cf-turnstile-response'], 
+            env.TURNSTILE_SECRET_KEY,
+            ip
           );
+          
+          if (!turnstileValid) {
+            return jsonResponse(
+              { success: false, errors: { turnstile: "فشل التحقق من الأمان. حاول مرة أخرى." } }, 
+              { status: 400, headers: corsHeaders }
+            );
+          }
         }
         
         // Generate submission data
@@ -232,6 +326,13 @@ export default {
           }, 
           { status: 201, headers: corsHeaders }
         );
+        } catch (submitError) {
+          console.error('Error in form submission:', submitError);
+          return jsonResponse(
+            { success: false, error: "خطأ في معالجة النموذج" }, 
+            { status: 500, headers: corsHeaders }
+          );
+        }
       }
       
       // GET /api/signatories - Public list (only consented submissions)
@@ -538,6 +639,11 @@ function getHomePage(): string {
                 </div>
             </div>
             
+            <!-- Turnstile CAPTCHA (optional) -->
+            <div class="form-group" id="turnstile-container" style="display: none;">
+                <div class="cf-turnstile" data-sitekey="TURNSTILE_SITE_KEY" data-theme="light" data-language="ar"></div>
+            </div>
+            
             <button type="submit">إرسال التوقيع</button>
         </form>
         
@@ -553,6 +659,9 @@ function getHomePage(): string {
         </div>
     </div>
 
+    <!-- Cloudflare Turnstile Script (loaded conditionally) -->
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
     <script>
         const form = document.getElementById('signForm');
         const messageDiv = document.getElementById('message');
@@ -561,6 +670,15 @@ function getHomePage(): string {
         window.addEventListener('load', function() {
             loadStats();
             loadSignatures();
+            
+            // Show Turnstile if site key is available
+            if (window.turnstile && document.querySelector('.cf-turnstile[data-sitekey="TURNSTILE_SITE_KEY"]')) {
+                // Replace with actual site key if configured
+                const turnstileContainer = document.getElementById('turnstile-container');
+                if (turnstileContainer && 'TURNSTILE_SITE_KEY' !== 'TURNSTILE_SITE_KEY') {
+                    turnstileContainer.style.display = 'block';
+                }
+            }
         });
         
         // Form submission
@@ -574,6 +692,15 @@ function getHomePage(): string {
             try {
                 const formData = new FormData(form);
                 
+                // Add Turnstile token if available
+                const turnstileElement = document.querySelector('.cf-turnstile');
+                if (turnstileElement && window.turnstile) {
+                    const turnstileToken = window.turnstile.getResponse(turnstileElement);
+                    if (turnstileToken) {
+                        formData.append('cf-turnstile-response', turnstileToken);
+                    }
+                }
+                
                 const response = await fetch('/api/submissions', {
                     method: 'POST',
                     body: formData
@@ -584,6 +711,12 @@ function getHomePage(): string {
                 if (result.success) {
                     showMessage(result.message, 'success');
                     form.reset();
+                    
+                    // Reset Turnstile if present
+                    if (turnstileElement && window.turnstile) {
+                        window.turnstile.reset(turnstileElement);
+                    }
+                    
                     // Reload stats and signatures
                     setTimeout(() => {
                         loadStats();
@@ -595,9 +728,20 @@ function getHomePage(): string {
                         errorMsg += '<br>' + Object.values(result.errors).join('<br>');
                     }
                     showMessage(errorMsg, 'error');
+                    
+                    // Reset Turnstile on error
+                    if (turnstileElement && window.turnstile) {
+                        window.turnstile.reset(turnstileElement);
+                    }
                 }
             } catch (error) {
                 showMessage('خطأ في الاتصال. حاول مرة أخرى.', 'error');
+                
+                // Reset Turnstile on error
+                const turnstileElement = document.querySelector('.cf-turnstile');
+                if (turnstileElement && window.turnstile) {
+                    window.turnstile.reset(turnstileElement);
+                }
             } finally {
                 submitButton.disabled = false;
                 submitButton.textContent = 'إرسال التوقيع';
