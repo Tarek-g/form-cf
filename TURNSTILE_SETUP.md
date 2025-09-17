@@ -1,153 +1,153 @@
-# 🛡️ إعداد Cloudflare Turnstile (اختياري)
+# 🛡️ Cloudflare Turnstile Setup (Optional)
 
-## ما هو Turnstile؟
+## What is Turnstile?
 
-Cloudflare Turnstile هو بديل مجاني وصديق للخصوصية لـ reCAPTCHA. يحمي النماذج من البريد العشوائي والروبوتات بدون إزعاج المستخدمين.
+Cloudflare Turnstile is a free and privacy-friendly alternative to reCAPTCHA. It protects forms from spam and bots without bothering users.
 
-## خطوات التفعيل
+## Activation steps
 
-### 1. إنشاء موقع Turnstile
+### 1. Create Turnstile site
 
-1. اذهب إلى [Cloudflare Dashboard](https://dash.cloudflare.com/)
-2. اختر حسابك واذهب إلى "Turnstile"
-3. انقر على "Add Site"
-4. أدخل معلومات الموقع:
-   - **Site Name**: اسم موقعك (مثل: "نموذج التوقيع")
-   - **Domain**: نطاق موقعك (مثل: `example.com` أو `localhost` للتطوير)
-   - **Widget Mode**: اختر "Managed"
+1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com/)
+2. Select your account and go to "Turnstile"
+3. Click "Add Site"
+4. Enter site information:
+   - **Site Name**: Your site name (e.g., "Signature Form")
+   - **Domain**: Your site domain (e.g., `example.com` or `localhost` for development)
+   - **Widget Mode**: Choose "Managed"
 
-### 2. الحصول على المفاتيح
+### 2. Get the keys
 
-بعد إنشاء الموقع، ستحصل على:
-- **Site Key** (مفتاح عام): يستخدم في الواجهة الأمامية
-- **Secret Key** (مفتاح سري): يستخدم في الخادم
+After creating the site, you'll get:
+- **Site Key** (public key): Used in frontend
+- **Secret Key** (private key): Used on server
 
-### 3. تحديث إعدادات Worker
+### 3. Update Worker settings
 
-#### أ. في `wrangler.toml`:
+#### a. In `wrangler.toml`:
 ```toml
 [vars]
-# ... إعدادات أخرى
+# ... other settings
 TURNSTILE_SECRET_KEY = "your_secret_key_here"
 ```
 
-#### ب. أو باستخدام wrangler secrets:
+#### b. Or using wrangler secrets:
 ```bash
 npx wrangler secret put TURNSTILE_SECRET_KEY
-# أدخل المفتاح السري عند السؤال
+# Enter the secret key when prompted
 ```
 
-### 4. تحديث النماذج
+### 4. Update forms
 
-#### للنماذج المضمنة (embed-code.js):
+#### For embedded forms (embed-code.js):
 ```javascript
 FormCF.init('form-widget', 'https://your-worker.workers.dev', {
-    language: 'ar',
+    language: 'en',
     theme: 'light',
-    turnstileSiteKey: 'your_site_key_here'  // أضف هذا السطر
+    turnstileSiteKey: 'your_site_key_here'  // Add this line
 });
 ```
 
-#### للنماذج البسيطة (simple-form.html):
-استبدل `YOUR_TURNSTILE_SITE_KEY` بالمفتاح العام الخاص بك:
+#### For simple forms (simple-form.html):
+Replace `YOUR_TURNSTILE_SITE_KEY` with your actual public key:
 ```html
 <div class="cf-turnstile" 
      data-sitekey="your_actual_site_key" 
      data-theme="light" 
-     data-language="ar"></div>
+     data-language="en"></div>
 ```
 
-## خيارات التخصيص
+## Customization options
 
-### الثيمات المتاحة:
-- `light`: ثيم فاتح (افتراضي)
-- `dark`: ثيم داكن
-- `auto`: يتكيف مع نظام المستخدم
+### Available themes:
+- `light`: Light theme (default)
+- `dark`: Dark theme
+- `auto`: Adapts to user's system
 
-### اللغات المدعومة:
-- `ar`: العربية
-- `en`: الإنجليزية
-- `fr`: الفرنسية
-- والمزيد...
+### Supported languages:
+- `en`: English
+- `fr`: French
+- `de`: German
+- And many more...
 
-### مثال متقدم:
+### Advanced example:
 ```html
 <div class="cf-turnstile" 
      data-sitekey="your_site_key"
      data-theme="auto"
-     data-language="ar"
+     data-language="en"
      data-size="compact"
      data-callback="onTurnstileSuccess"
      data-error-callback="onTurnstileError"></div>
 ```
 
-## اختبار التكامل
+## Test integration
 
-### 1. تشغيل محلي:
+### 1. Run locally:
 ```bash
 npx wrangler dev
 ```
 
-### 2. اختبار النموذج:
-- افتح المتصفح على `http://localhost:8787`
-- املأ النموذج
-- تأكد من ظهور Turnstile (إذا كان مفعل)
-- أرسل النموذج
+### 2. Test form:
+- Open browser to `http://localhost:8787`
+- Fill out form
+- Make sure Turnstile appears (if enabled)
+- Submit form
 
-### 3. فحص السجلات:
+### 3. Check logs:
 ```bash
 npx wrangler tail
 ```
 
-## استكشاف الأخطاء
+## Troubleshooting
 
-### مشاكل شائعة:
+### Common issues:
 
-#### 1. Turnstile لا يظهر:
-- تأكد من صحة Site Key
-- تأكد من إضافة النطاق في إعدادات Turnstile
-- تأكد من تحميل السكريبت: `https://challenges.cloudflare.com/turnstile/v0/api.js`
+#### 1. Turnstile doesn't appear:
+- Make sure Site Key is correct
+- Make sure domain is added in Turnstile settings
+- Make sure script loads: `https://challenges.cloudflare.com/turnstile/v0/api.js`
 
-#### 2. فشل التحقق:
-- تأكد من صحة Secret Key في متغيرات البيئة
-- تأكد من تطابق النطاق
-- فحص سجلات Worker للأخطاء
+#### 2. Verification fails:
+- Make sure Secret Key is correct in environment variables
+- Make sure domain matches
+- Check Worker logs for errors
 
-#### 3. للتطوير المحلي:
-- أضف `localhost` في إعدادات النطاق في Turnstile
-- أو استخدم `127.0.0.1`
+#### 3. For local development:
+- Add `localhost` in domain settings in Turnstile
+- Or use `127.0.0.1`
 
-## إعدادات الأمان
+## Security settings
 
-### أفضل الممارسات:
-1. **لا تكشف Secret Key أبداً** في الكود الأمامي
-2. استخدم `wrangler secret` بدلاً من `wrangler.toml` للبيئة الإنتاج
-3. قم بتحديد النطاقات المسموحة بدقة
-4. راقب محاولات الاختراق من خلال سجلات Cloudflare
+### Best practices:
+1. **Never expose Secret Key** in frontend code
+2. Use `wrangler secret` instead of `wrangler.toml` for production
+3. Specify allowed domains precisely
+4. Monitor hacking attempts through Cloudflare logs
 
-### مثال إعداد إنتاج آمن:
+### Secure production setup example:
 ```bash
-# إعداد المفاتيح بشكل آمن
+# Setup keys securely
 npx wrangler secret put TURNSTILE_SECRET_KEY --env production
 npx wrangler secret put ENC_KEY_B64 --env production
 npx wrangler secret put ADMIN_BEARER --env production
 ```
 
-## التكامل الاختياري
+## Optional integration
 
-النظام يعمل بدون Turnstile أيضاً! إذا لم تضع المفاتيح، سيتم تجاهل التحقق من Turnstile والاعتماد على الطرق الأخرى لمنع البريد العشوائي:
+The system also works without Turnstile! If you don't set the keys, Turnstile verification will be skipped and rely on other methods to prevent spam:
 
-- فحص عنوان IP
-- التحقق من صحة البيانات
-- منع التكرار بنفس البريد الإلكتروني
+- IP address checking
+- Data validation
+- Prevent duplicates with same email
 
-## الدعم
+## Support
 
-إذا واجهت مشاكل:
-1. راجع [وثائق Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/)
-2. تأكد من تحديث Worker إلى أحدث إصدار
-3. فحص سجلات المتصفح والـ Worker
+If you encounter issues:
+1. Review [Cloudflare Turnstile documentation](https://developers.cloudflare.com/turnstile/)
+2. Make sure to update Worker to latest version
+3. Check browser and Worker logs
 
 ---
 
-📝 **ملاحظة**: Turnstile مجاني للاستخدام مع Cloudflare وأكثر صداقة للخصوصية من البدائل الأخرى.
+📝 **Note**: Turnstile is free to use with Cloudflare and more privacy-friendly than other alternatives.

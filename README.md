@@ -1,30 +1,30 @@
-# 📝 Form CF - نظام الاستمارات البسيط والرخيص
+# 📝 Form CF - Simple and Affordable Form System
 
-**🚀 التطبيق متاح الآن على:** https://form-cf.tarekgorany.workers.dev
+**🚀 Application available at:** https://form-cf.tarekgorany.workers.dev
 
-نظام استمارات مبني على **Cloudflare Workers** و **D1 Database** لإنشاء استمارات أونلاين بسيطة وسهلة وبتكلفة منخفضة جداً.
+A simple form system built on **Cloudflare Workers** and **D1 Database** for creating simple, easy, and very low-cost online forms.
 
-## ✨ المميزات
+## ✨ Features
 
-- 🚀 **سريع وموثوق** - يعمل على شبكة Cloudflare العالمية
-- 💰 **رخيص جداً** - تكلفة شبه مجانية مع Cloudflare Workers
-- 🔧 **سهل التركيب** - إعداد في دقائق معدودة
-- 🌍 **دعم العربية** - واجهة كاملة باللغة العربية
-- 🔒 **حماية الخصوصية** - لا يظهر البريد الإلكتروني في القوائم العامة
-- 🛡️ **تشفير متقدم** - تشفير AES-GCM لجميع البيانات الحساسة
-- 📱 **متجاوب** - يعمل على جميع الأجهزة
-- 🎨 **قابل للتخصيص** - سهل التعديل والتطوير
-- 🔗 **سهل التضمين** - أضفه لأي موقع بكود بسيط
-- 🔐 **أمان على مستوى المؤسسات** - تشفير البيانات أثناء التخزين
+- 🚀 **Fast and reliable** - Runs on Cloudflare's global network
+- 💰 **Very affordable** - Nearly free cost with Cloudflare Workers
+- 🔧 **Easy to install** - Setup in minutes
+- 🌍 **English support** - Complete English interface
+- 🔒 **Privacy protection** - Email addresses never shown in public lists
+- 🛡️ **Advanced encryption** - AES-GCM encryption for all sensitive data
+- 📱 **Responsive** - Works on all devices
+- 🎨 **Customizable** - Easy to modify and develop
+- 🔗 **Easy to embed** - Add to any website with simple code
+- 🔐 **Enterprise-grade security** - Data encryption at rest
 
-## 🏗️ البنية التقنية
+## 🏗️ Technical Architecture
 
 ```mermaid
 graph TB
-    A[متصفح المستخدم] --> B[Cloudflare Worker]
+    A[User Browser] --> B[Cloudflare Worker]
     B --> C[D1 Database SQLite]
     B --> D[CORS Headers]
-    E[نموذج HTML] --> A
+    E[HTML Form] --> A
     F[Widget JS] --> A
     G[REST API] --> B
     
@@ -41,44 +41,44 @@ graph TB
     B --> K
 ```
 
-## 🛡️ الأمان والتشفير
+## 🛡️ Security and Encryption
 
-### 🔐 **تشفير على مستوى التطبيق (Application-Layer Encryption)**
+### 🔐 **Application-Layer Encryption**
 
-يستخدم النظام **AES-GCM 256-bit** لتشفير جميع البيانات الحساسة قبل تخزينها في D1:
+The system uses **AES-GCM 256-bit** to encrypt all sensitive data before storing in D1:
 
-#### 🔄 **عملية التشفير:**
-1. **البيانات المشفرة**: الاسم، المؤسسة، البريد، التعليق
-2. **مفتاح التشفير**: محفوظ كسر Worker في Cloudflare
-3. **IV فريد**: 12 بايت عشوائي لكل سجل
-4. **تحديد هوية المفتاح**: لدعم تدوير المفاتيح
+#### 🔄 **Encryption Process:**
+1. **Encrypted data**: Name, organization, email, comment
+2. **Encryption key**: Stored as Worker secret in Cloudflare
+3. **Unique IV**: 12 random bytes for each record
+4. **Key identifier**: For key rotation support
 
-#### 📊 **حماية البريد الإلكتروني:**
-- **SHA-256 هاش**: لمنع الازدواجية بدون الكشف
-- **عدم العرض العام**: لن يظهر البريد في أي API عام
-- **وصول محدود**: فقط للمشرف مع التوكن
+#### 📊 **Email Protection:**
+- **SHA-256 hash**: Prevents duplicates without disclosure
+- **No public display**: Email never appears in any public API
+- **Limited access**: Only admin with token
 
-#### 🔒 **مستويات الأمان:**
-- **في التخزين**: تشفير في D1 Database
-- **في النقل**: HTTPS/TLS عبر Cloudflare
-- **في المعالجة**: فك تشفير فقط داخل Worker
-- **الوصول**: تحكم صلاحيات متقدم
+#### 🔒 **Security Levels:**
+- **At rest**: Encryption in D1 Database
+- **In transit**: HTTPS/TLS via Cloudflare
+- **In processing**: Decryption only inside Worker
+- **Access**: Advanced permission control
 
 ```bash
-# إعداد مفاتيح التشفير
+# Setup encryption keys
 echo "your-256-bit-key-base64" | npx wrangler secret put ENC_KEY_B64
 echo "v1" | npx wrangler secret put ENC_KEY_ID
 ```
 
-## 📋 المتطلبات
+## 📋 Requirements
 
-- حساب [Cloudflare](https://cloudflare.com) (مجاني)
-- [Node.js](https://nodejs.org) (الإصدار 18 أو أحدث)
+- [Cloudflare](https://cloudflare.com) account (free)
+- [Node.js](https://nodejs.org) (version 18 or newer)
 - [Git](https://git-scm.com)
 
-## 🚀 التركيب السريع
+## 🚀 Quick Installation
 
-### 1. استنساخ المشروع
+### 1. Clone the project
 
 ```bash
 git clone https://github.com/YOUR-USERNAME/form-cf.git
@@ -86,100 +86,120 @@ cd form-cf
 npm install
 ```
 
-### 2. إعداد Cloudflare D1
+### 2. Setup Cloudflare D1
 
 ```bash
-# إنشاء قاعدة بيانات D1
+# Create D1 database
 npx wrangler d1 create form_db
 
-# نسخ database_id من النتيجة وضعه في wrangler.toml
-# تطبيق Migration الأولي
+# Copy database_id from result and put it in wrangler.toml
+# Apply initial migration
 npx wrangler d1 migrations apply form_db
 
-# التحقق من الجداول
+# Verify tables
 npx wrangler d1 execute form_db --command="SELECT name FROM sqlite_master WHERE type='table';"
 ```
 
-### 3. إعداد مفاتيح التشفير
+### 3. Setup encryption keys
 
 ```bash
-# توليد مفتاح تشفير 256-بت
+# Generate 256-bit encryption key (32 bytes)
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+
+# Or using OpenSSL
 openssl rand -base64 32
 
-# حفظ مفتاح التشفير كسر Worker
-echo "YOUR-GENERATED-KEY" | npx wrangler secret put ENC_KEY_B64
+# Save encryption key as Worker secret (for production)
+echo "YOUR-GENERATED-256BIT-KEY" | npx wrangler secret put ENC_KEY_B64
 echo "v1" | npx wrangler secret put ENC_KEY_ID
+
+# For local development: add keys in wrangler.toml
+# ENC_KEY_B64 = "your-generated-base64-key-here"
+# ENC_KEY_ID = "v1"
 ```
 
-### 4. تحديث الإعدادات
+**⚠️ Important:** Make sure the key is exactly 32 bytes (256 bits) - otherwise you'll get an AES key length error.
 
-افتح `wrangler.toml` وحدث:
+### 4. Update settings
+
+Open `wrangler.toml` and update:
 
 ```toml
-# استبدل YOUR-D1-DATABASE-ID بالمعرف الصحيح
+# Replace YOUR-D1-DATABASE-ID with the correct ID
 database_id = "your-actual-d1-database-id"
 
 [vars]
-# غير هذا لرمز سري قوي
+# Change this to a strong secret token
 ADMIN_BEARER = "your-super-secret-admin-token-here"
-# أضف النطاقات المسموحة
+# Add allowed domains
 ALLOWED_ORIGINS = "https://yoursite.com,https://anotherdomain.com"
+# Encryption keys (for local development only)
+ENC_KEY_B64 = "your-generated-256bit-key-here"
+ENC_KEY_ID = "v1"
+# Turnstile (optional)
+# TURNSTILE_SECRET_KEY = "your-turnstile-secret-key"
 ```
 
-### 5. النشر
+**⚠️ Important for production:** Use `wrangler secret` instead of putting keys in wrangler.toml:
+```bash
+echo "your-key" | npx wrangler secret put ENC_KEY_B64
+echo "your-admin-token" | npx wrangler secret put ADMIN_BEARER
+```
+
+### 5. Deploy
 
 ```bash
-# نشر على Cloudflare Workers
+# Deploy to Cloudflare Workers
 npm run deploy
 
-# أو للتطوير المحلي
+# Or for local development
 npm run dev
 ```
 
-## 📖 طرق الاستخدام
+## 📖 Usage Methods
 
-### 1. النموذج البسيط (بدون JavaScript)
+### 1. Simple form (without JavaScript)
 
 ```html
 <form action="https://your-worker.workers.dev/api/submissions" method="post">
-    <label>الاسم: <input name="name" required></label>
-    <label>المؤسسة: <input name="org"></label>
-    <label>البريد: <input name="email" type="email" required></label>
-    <label>تعليق: <textarea name="comment"></textarea></label>
+    <label>Name: <input name="name" required></label>
+    <label>Organization: <input name="org"></label>
+    <label>Email: <input name="email" type="email" required></label>
+    <label>Comment: <textarea name="comment"></textarea></label>
     <label>
         <input name="consent_public" type="checkbox" value="1">
-        أوافق على عرض اسمي وتعليقي علناً
+        I agree to display my name and comment publicly
     </label>
-    <button type="submit">إرسال</button>
+    <button type="submit">Submit</button>
 </form>
 ```
 
-### 2. الويدجت المتطور (مع JavaScript)
+### 2. Advanced widget (with JavaScript)
 
 ```html
-<!-- أضف هذا في HTML -->
+<!-- Add this in HTML -->
 <div id="form-widget" 
      data-formcf-url="https://your-worker.workers.dev"
-     data-formcf-lang="ar"></div>
+     data-formcf-lang="en"></div>
 
-<!-- أضف السكريبت -->
+<!-- Add the script -->
 <script src="https://your-domain.com/embed-code.js"></script>
 ```
 
-أو استخدم الطريقة اليدوية:
+Or use the manual method:
 
 ```html
 <div id="my-form"></div>
 <script src="path/to/embed-code.js"></script>
 <script>
 FormCF.init('my-form', 'https://your-worker.workers.dev', {
-    language: 'ar',
+    language: 'en',
     theme: 'light'
 });
 </script>
 ```
 
-### 3. عرض قائمة الموقعين
+### 3. Display signatories list
 
 ```html
 <div id="signatories-list"></div>
@@ -199,52 +219,52 @@ fetch('https://your-worker.workers.dev/api/signatories')
 </script>
 ```
 
-## 🔌 واجهة برمجة التطبيقات (API)
+## 🔌 API (Application Programming Interface)
 
-### إرسال نموذج جديد
+### Submit new form
 ```http
 POST /api/submissions
 Content-Type: application/x-www-form-urlencoded
 
-name=أحمد محمد&email=ahmed@example.com&org=منظمة&comment=تعليق&consent_public=1
+name=John Doe&email=john@example.com&org=Organization&comment=Comment&consent_public=1
 ```
 
-**الاستجابة:**
+**Response:**
 ```json
 {
   "success": true,
   "id": "uuid-here",
-  "message": "تم إرسال النموذج بنجاح. شكراً لك!"
+  "message": "Form submitted successfully. Thank you!"
 }
 ```
 
-### جلب قائمة الموقعين العامة
+### Get public signatories list
 ```http
 GET /api/signatories
 ```
 
-**الاستجابة:**
+**Response:**
 ```json
 {
   "success": true,
   "count": 25,
   "signatories": [
     {
-      "name": "أحمد محمد",
-      "org": "منظمة حقوق الإنسان", 
-      "comment": "أدعم هذه المبادرة",
+      "name": "John Doe",
+      "org": "Human Rights Organization", 
+      "comment": "I support this initiative",
       "created_at": 1703097600000
     }
   ]
 }
 ```
 
-### جلب الإحصائيات
+### Get statistics
 ```http
 GET /api/stats
 ```
 
-**الاستجابة:**
+**Response:**
 ```json
 {
   "success": true,
@@ -253,30 +273,30 @@ GET /api/stats
 }
 ```
 
-### عرض البيانات الكاملة (للمشرف)
+### View complete data (for admin)
 ```http
 GET /api/submissions
 Authorization: Bearer your-admin-token
 ```
 
-## ⚙️ التخصيص والتطوير
+## ⚙️ Customization and Development
 
-### إضافة حقول جديدة
+### Add new fields
 
-1. **عدّل الجدول:**
+1. **Modify the table:**
 ```sql
 ALTER TABLE submissions ADD COLUMN phone TEXT;
 ALTER TABLE submissions ADD COLUMN city TEXT;
 ```
 
-2. **حدث التحقق في `worker.ts`:**
+2. **Update validation in `worker.ts`:**
 ```typescript
 function validateSubmission(payload: any) {
-    // أضف التحقق من الحقول الجديدة
+    // Add validation for new fields
     const phone = (payload.phone || "").toString().trim();
     const city = (payload.city || "").toString().trim();
     
-    // أضف لمتغير البيانات
+    // Add to data variable
     return { 
         ok: ..., 
         errors: ..., 
@@ -285,7 +305,7 @@ function validateSubmission(payload: any) {
 }
 ```
 
-3. **حدث SQL INSERT:**
+3. **Update SQL INSERT:**
 ```typescript
 await env.DB.prepare(
     `INSERT INTO submissions (id, created_at, name, org, email, comment, phone, city, consent_public, ip_hash, ua)
@@ -293,26 +313,55 @@ await env.DB.prepare(
 ).bind(id, created_at, data.name, data.org, data.email, data.comment, data.phone, data.city, data.consent_public ? 1 : 0, ip_hash, ua).run();
 ```
 
-### تخصيص التصميم
+### Design customization
 
-عدّل CSS في `embed-code.js` أو `worker.ts` لتغيير:
-- الألوان والخطوط
-- التخطيط والأحجام  
-- الرسائل والنصوص
-- التأثيرات والانيميشن
+Edit CSS in `embed-code.js` or `worker.ts` to change:
+- Colors and fonts
+- Layout and sizes  
+- Messages and texts
+- Effects and animations
 
-### إعداد حماية ضد السبام
+### Anti-spam protection setup
 
-1. **أضف Cloudflare Turnstile:**
-```html
-<div class="cf-turnstile" data-sitekey="your-site-key"></div>
+#### 1. Cloudflare Turnstile (optional)
+Free and privacy-friendly CAPTCHA from Cloudflare:
+
+```bash
+# 1. Go to Cloudflare Dashboard > Turnstile
+# 2. Add new site and get Site Key + Secret Key
+# 3. Add Secret Key to Worker
+echo "your-turnstile-secret-key" | npx wrangler secret put TURNSTILE_SECRET_KEY
 ```
 
-2. **فعّل Rate Limiting من لوحة Cloudflare**
+In the form:
+```html
+<!-- Add Turnstile widget -->
+<div class="cf-turnstile" 
+     data-sitekey="your-site-key" 
+     data-theme="light" 
+     data-language="en"></div>
 
-3. **أضف التحقق من IP:**
+<!-- Add the script -->
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+```
+
+For advanced widget:
+```javascript
+FormCF.init('form-widget', 'https://your-worker.workers.dev', {
+    language: 'en',
+    theme: 'light',
+    turnstileSiteKey: 'your-site-key'  // Add this
+});
+```
+
+📝 **Read more:** [TURNSTILE_SETUP.md](TURNSTILE_SETUP.md)
+
+#### 2. Rate Limiting from Cloudflare
+Enable Rate Limiting from Cloudflare dashboard to prevent spam.
+
+#### 3. IP limiting in code
 ```typescript
-// في worker.ts
+// In worker.ts - prevent more than 5 submissions per day
 const submissions_today = await env.DB.prepare(
     `SELECT COUNT(*) as count FROM submissions 
      WHERE ip_hash = ? AND created_at > ?`
@@ -320,150 +369,190 @@ const submissions_today = await env.DB.prepare(
 
 if (submissions_today.count >= 5) {
     return jsonResponse(
-        { success: false, error: "تم الوصول للحد الأقصى من الإرسال اليومي" }, 
+        { success: false, error: "Daily submission limit reached" }, 
         { status: 429 }
     );
 }
 ```
 
-## 🔒 الأمان والخصوصية
+## 🔒 Security and Privacy
 
-### 🛡️ **تشفير على مستوى المؤسسات**
-- ✅ **AES-GCM 256-bit** - تشفير جميع البيانات الحساسة في D1
-- ✅ **Worker Secrets** - مفاتيح التشفير محفوظة بأمان
-- ✅ **فك تشفير محدود** - فقط داخل Worker مع صلاحيات
-- ✅ **تدوير المفاتيح** - دعم key_id للتحديث الآمن
+### 🛡️ **Enterprise-grade encryption**
+- ✅ **AES-GCM 256-bit** - Encrypt all sensitive data in D1
+- ✅ **Worker Secrets** - Encryption keys securely stored
+- ✅ **Limited decryption** - Only inside Worker with permissions
+- ✅ **Key rotation** - key_id support for secure updates
 
-### 🔐 **حماية الخصوصية**
-- ✅ **عدم عرض البريد** - لن يظهر في أي API عام أبداً
-- ✅ **SHA-256 هاش** - منع الازدواجية بدون كشف البريد
-- ✅ **موافقة صريحة** - عرض عام فقط مع consent_public=1
+### 🔐 **Privacy protection**
+- ✅ **No email display** - Never shown in any public API
+- ✅ **SHA-256 hash** - Prevent duplicates without email disclosure
+- ✅ **Explicit consent** - Public display only with consent_public=1
 
-### 📊 **أمان عام**
-- ✅ **CORS محدود** - فقط النطاقات المسموحة
-- ✅ **Rate Limiting** - حد أقصى للطلبات
-- ✅ **Hash للـ IP** - لا نحفظ عناوين IP مكشوفة
-- ✅ **التحقق من البيانات** - validation شامل
-- ✅ **رمز مشرف سري** - للوصول للبيانات الحساسة
+### 📊 **General security**
+- ✅ **Limited CORS** - Only allowed domains
+- ✅ **Rate Limiting** - Request limits
+- ✅ **IP hashing** - No raw IP addresses stored
+- ✅ **Data validation** - Comprehensive validation
+- ✅ **Secret admin token** - For accessing sensitive data
 
-### 🛠️ **إدارة المفاتيح**
+### 🛠️ **Key management**
 ```bash
-# تحديث مفتاح التشفير
+# Update encryption key
 echo "new-key-base64" | npx wrangler secret put ENC_KEY_B64
 echo "v2" | npx wrangler secret put ENC_KEY_ID
 
-# تعيين مفتاح قديم مؤقتاً للبيانات القديمة
+# Set old key temporarily for old data
 echo "old-key-base64" | npx wrangler secret put ENC_KEY_PREV_B64
 ```
 
-## 📊 المراقبة والإحصائيات
+## 📊 Monitoring and Statistics
 
-### عرض اللوجات المباشرة
+### View live logs
 ```bash
 npm run tail
 ```
 
-### تصدير البيانات
+### Export data
 ```bash
-# تصدير كامل للبيانات (باستخدام المفتاح الإداري)
+# Full data export (using admin key)
 npx wrangler d1 execute form_db --command=".dump" > backup.sql
 
-# تصدير بصيغة CSV (بيانات غير مشفرة فقط)
+# CSV export (unencrypted data only)
 npx wrangler d1 execute form_db --command="SELECT name,email,org,comment,created_at FROM submissions WHERE pii_ct IS NULL;" --format=table
 
-# ملاحظة: البيانات المشفرة تحتاج إلى فك تشفير عبر API المشرف
+# Note: Encrypted data needs decryption via admin API
 ```
 
-### إحصائيات التكلفة
-مع Cloudflare Workers:
-- **100,000 طلب/يوم مجاناً**
-- **$0.50 لكل مليون طلب إضافي**
-- **قاعدة D1 مجانية حتى 5GB**
+### Cost statistics
+With Cloudflare Workers:
+- **100,000 requests/day free**
+- **$0.50 per million additional requests**
+- **D1 database free up to 5GB**
 
-## 🛠️ الأوامر المفيدة
+## 🛠️ Useful commands
 
 ```bash
-# التطوير المحلي
+# Local development
 npm run dev
 
-# النشر للإنتاج  
+# Deploy to production  
 npm run deploy
 
-# مراقبة اللوجات
+# Monitor logs
 npm run tail
 
-# التحقق من الكود
+# Type checking
 npm run type-check
 
-# إنشاء قاعدة بيانات جديدة
+# Create new database
 npm run db:create
 
-# تطبيق migrations
+# Apply migrations
 npm run db:migrate
 
-# فحص البيانات
+# Inspect data
 npm run db:console
 ```
 
-## 🐛 حل المشاكل الشائعة
+## 🐛 Common troubleshooting
 
-### خطأ "Database not found"
+### "Database not found" error
 ```bash
-# تأكد من إنشاء قاعدة البيانات
+# Make sure to create the database
 npx wrangler d1 create form_db
-# نسخ database_id لـ wrangler.toml
-# تطبيق migrations
+# Copy database_id to wrangler.toml
+# Apply migrations
 npx wrangler d1 migrations apply form_db
 ```
 
-### خطأ CORS
-- تأكد من إضافة نطاقك في `ALLOWED_ORIGINS`
-- للتطوير المحلي أضف `http://localhost:3000`
-
-### خطأ "Unauthorized" عند الوصول للبيانات
-- تأكد من تحديث `ADMIN_BEARER` في `wrangler.toml`
-- استخدم `Authorization: Bearer your-token` في الطلب
-
-### مشاكل التشفير
+### "no such column: email_sha256" error
 ```bash
-# فحص مفاتيح التشفير
+# Apply encryption migration
+npx wrangler d1 migrations apply form_db
+
+# Check table structure
+npx wrangler d1 execute form_db --command="PRAGMA table_info(submissions);"
+```
+
+### "AES key length must be 256 bits" error
+```bash
+# Generate correct 32-byte key
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+
+# Update key in wrangler.toml or
+echo "NEW-32BYTE-KEY" | npx wrangler secret put ENC_KEY_B64
+```
+
+### "Form validation errors" (name required)
+- Make sure to fill all required fields
+- Check email format
+- Check server logs: `npm run tail`
+
+### CORS error
+- Make sure to add your domain in `ALLOWED_ORIGINS`
+- For local development add `http://localhost:3000`
+
+### "Unauthorized" error when accessing data
+- Make sure to update `ADMIN_BEARER` in `wrangler.toml`
+- Use `Authorization: Bearer your-token` in request
+
+### Encryption issues
+```bash
+# Check encryption keys
 npx wrangler secret list
 
-# إعادة تعيين مفتاح التشفير
-openssl rand -base64 32 | npx wrangler secret put ENC_KEY_B64
+# Reset encryption key
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))" | npx wrangler secret put ENC_KEY_B64
 
-# فحص البيانات المشفرة
+# Check encrypted data
 npx wrangler d1 execute form_db --command="SELECT id, pii_ct IS NOT NULL as encrypted, key_id FROM submissions LIMIT 5;" --remote
 ```
 
-### مشاكل فك التشفير
-- تأكد من أن `key_id` يطابق `ENC_KEY_ID`
-- البيانات القديمة قد تظهر كـ "[ENCRYPTED]" في الواجهة الإدارية
+### Decryption issues
+- Make sure `key_id` matches `ENC_KEY_ID`
+- Old data may show as "[ENCRYPTED]" in admin interface
 
-## 🤝 المساهمة
+### Turnstile issues
+- Make sure Site Key is correct in frontend
+- Make sure domain is added in Turnstile settings
+- For local development add `localhost` in domain settings
 
-1. Fork المشروع
-2. إنشاء branch جديد (`git checkout -b feature/amazing-feature`)
-3. Commit التغييرات (`git commit -m 'Add amazing feature'`)
-4. Push للـ branch (`git push origin feature/amazing-feature`)  
-5. فتح Pull Request
+### Process monitoring
+```bash
+# Live logs
+npx wrangler tail --format=pretty
 
-## 📄 الترخيص
+# Check database
+npx wrangler d1 execute form_db --command="SELECT COUNT(*) FROM submissions;"
 
-هذا المشروع مرخص تحت رخصة MIT - انظر ملف [LICENSE](LICENSE) للتفاصيل.
+# Check encrypted data
+npx wrangler d1 execute form_db --command="SELECT id, pii_ct IS NOT NULL as has_encryption FROM submissions LIMIT 5;"
+```
 
-## 📞 الدعم
+## 🤝 Contributing
 
-- 🐛 **مشاكل تقنية:** افتح [Issue جديد](https://github.com/YOUR-USERNAME/form-cf/issues)
-- 💬 **أسئلة عامة:** [Discussions](https://github.com/YOUR-USERNAME/form-cf/discussions)
-- 📧 **تواصل مباشر:** your-email@example.com
+1. Fork the project
+2. Create new branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)  
+5. Open Pull Request
 
-## 🙏 شكر وتقدير
+## 📄 License
 
-- [Cloudflare Workers](https://workers.cloudflare.com) للبنية التحتية الرائعة
-- [D1 Database](https://developers.cloudflare.com/d1/) لقاعدة البيانات السريعة
-- [Wrangler](https://developers.cloudflare.com/workers/wrangler/) لأدوات التطوير
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 📞 Support
+
+- 🐛 **Technical issues:** Open [new Issue](https://github.com/YOUR-USERNAME/form-cf/issues)
+- 💬 **General questions:** [Discussions](https://github.com/YOUR-USERNAME/form-cf/discussions)
+- 📧 **Direct contact:** your-email@example.com
+
+## 🙏 Acknowledgments
+
+- [Cloudflare Workers](https://workers.cloudflare.com) for the amazing infrastructure
+- [D1 Database](https://developers.cloudflare.com/d1/) for the fast database
+- [Wrangler](https://developers.cloudflare.com/workers/wrangler/) for development tools
 
 ---
 
-**صنع بـ ❤️ لجعل الاستمارات أبسط وأرخص للجميع**
+**Made with ❤️ to make forms simpler and cheaper for everyone**

@@ -1,8 +1,8 @@
 /**
  * Form CF Embed Widget
- * ويدجت التضمين لنظام النماذج
+ * Embeddable form widget for the form system
  * 
- * الاستخدام:
+ * Usage:
  * <div id="form-cf-widget"></div>
  * <script src="path/to/embed-code.js"></script>
  * <script>FormCF.init('form-cf-widget', 'https://your-worker.workers.dev');</script>
@@ -16,7 +16,7 @@
             apiUrl: '',
             containerId: '',
             theme: 'light',
-            language: 'ar'
+            language: 'en'
         },
         
         // Initialize the widget
@@ -57,8 +57,8 @@
                 return;
             }
             
-            const isRTL = this.config.language === 'ar';
-            const direction = isRTL ? 'rtl' : 'ltr';
+            const isRTL = false;
+            const direction = 'ltr';
             const lang = this.config.language;
             
             const texts = this.getTexts(lang);
@@ -207,7 +207,7 @@
                             <div class="cf-turnstile" 
                                  data-sitekey="TURNSTILE_SITE_KEY" 
                                  data-theme="${this.config.theme || 'light'}" 
-                                 data-language="${this.config.language || 'ar'}"></div>
+                                 data-language="${this.config.language || 'en'}"></div>
                         </div>
                         
                         <button type="submit" class="form-cf-button">
@@ -336,20 +336,6 @@
         // Get localized texts
         getTexts: function(lang) {
             const texts = {
-                ar: {
-                    title: '📝 نموذج التوقيع',
-                    nameLabel: 'الاسم الكامل *',
-                    orgLabel: 'المؤسسة أو الجهة (اختياري)',
-                    emailLabel: 'البريد الإلكتروني *',
-                    commentLabel: 'تعليق أو رسالة (اختياري)',
-                    commentPlaceholder: 'شاركنا رأيك أو رسالتك...',
-                    consentLabel: 'أوافق على عرض اسمي وتعليقي في القائمة العامة للموقعين. (بريدك الإلكتروني لن يظهر أبداً للعامة)',
-                    submitButton: 'إرسال التوقيع',
-                    submitting: 'جاري الإرسال...',
-                    successMessage: 'تم إرسال النموذج بنجاح. شكراً لك!',
-                    errorMessage: 'حدث خطأ في الإرسال',
-                    networkError: 'خطأ في الاتصال. حاول مرة أخرى.'
-                },
                 en: {
                     title: '📝 Signature Form',
                     nameLabel: 'Full Name *',
@@ -366,7 +352,7 @@
                 }
             };
             
-            return texts[lang] || texts.ar;
+            return texts[lang] || texts.en;
         }
     };
     
@@ -378,7 +364,7 @@
         const autoWidgets = document.querySelectorAll('[data-formcf-url]');
         autoWidgets.forEach(function(widget) {
             const apiUrl = widget.getAttribute('data-formcf-url');
-            const lang = widget.getAttribute('data-formcf-lang') || 'ar';
+            const lang = widget.getAttribute('data-formcf-lang') || 'en';
             const theme = widget.getAttribute('data-formcf-theme') || 'light';
             
             FormCF.init(widget.id, apiUrl, { language: lang, theme: theme });

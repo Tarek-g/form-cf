@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ويدجت النموذج المتطور - مع JavaScript</title>
+    <title>Advanced Form Widget - With JavaScript</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -129,21 +129,21 @@
 </head>
 <body>
     <div class="widget-container">
-        <h1>🎯 ويدجت النموذج المتطور</h1>
+        <h1>🎯 Advanced Form Widget</h1>
         
         <div class="instructions">
-            <strong>📋 التعليمات:</strong>
+            <strong>📋 Instructions:</strong>
             <ol>
-                <li>استبدل <code>YOUR-WORKER-DOMAIN</code> برابط الـ Worker الخاص بك</li>
-                <li>انسخ الكود أدناه والصقه في موقعك</li>
-                <li>يمكنك تخصيص التصميم حسب احتياجاتك</li>
+                <li>Replace <code>YOUR-WORKER-DOMAIN</code> with your Worker URL</li>
+                <li>Copy the code below and paste it into your website</li>
+                <li>You can customize the styling according to your needs</li>
             </ol>
         </div>
 
         <div class="demo-section">
-            <h3>💡 مثال الاستخدام - كود HTML + JavaScript</h3>
+            <h3>💡 Usage Example - HTML + JavaScript Code</h3>
             <div class="code-block">
-&lt;!-- ضع هذا الكود في موقعك --&gt;
+&lt;!-- Place this code in your website --&gt;
 &lt;div id="form-widget"&gt;&lt;/div&gt;
 &lt;script&gt;
 (function() {
@@ -152,37 +152,37 @@
     const widgetHTML = `
         &lt;div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;"&gt;
             &lt;form id="embedded-form" style="background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);"&gt;
-                &lt;h3 style="text-align: center; color: #2c3e50; margin-bottom: 1.5rem;"&gt;📝 نموذج التوقيع&lt;/h3&gt;
+                &lt;h3 style="text-align: center; color: #2c3e50; margin-bottom: 1.5rem;"&gt;📝 Signature Form&lt;/h3&gt;
                 
                 &lt;div style="margin-bottom: 1rem;"&gt;
-                    &lt;label style="display: block; margin-bottom: 0.5rem; font-weight: bold;"&gt;الاسم الكامل *&lt;/label&gt;
+                    &lt;label style="display: block; margin-bottom: 0.5rem; font-weight: bold;"&gt;Full Name *&lt;/label&gt;
                     &lt;input type="text" name="name" required style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 5px; box-sizing: border-box;"&gt;
                 &lt;/div&gt;
                 
                 &lt;div style="margin-bottom: 1rem;"&gt;
-                    &lt;label style="display: block; margin-bottom: 0.5rem; font-weight: bold;"&gt;المؤسسة (اختياري)&lt;/label&gt;
+                    &lt;label style="display: block; margin-bottom: 0.5rem; font-weight: bold;"&gt;Organization (Optional)&lt;/label&gt;
                     &lt;input type="text" name="org" style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 5px; box-sizing: border-box;"&gt;
                 &lt;/div&gt;
                 
                 &lt;div style="margin-bottom: 1rem;"&gt;
-                    &lt;label style="display: block; margin-bottom: 0.5rem; font-weight: bold;"&gt;البريد الإلكتروني *&lt;/label&gt;
+                    &lt;label style="display: block; margin-bottom: 0.5rem; font-weight: bold;"&gt;Email Address *&lt;/label&gt;
                     &lt;input type="email" name="email" required style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 5px; box-sizing: border-box;"&gt;
                 &lt;/div&gt;
                 
                 &lt;div style="margin-bottom: 1rem;"&gt;
-                    &lt;label style="display: block; margin-bottom: 0.5rem; font-weight: bold;"&gt;تعليق (اختياري)&lt;/label&gt;
+                    &lt;label style="display: block; margin-bottom: 0.5rem; font-weight: bold;"&gt;Comment (Optional)&lt;/label&gt;
                     &lt;textarea name="comment" rows="3" style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 5px; box-sizing: border-box;"&gt;&lt;/textarea&gt;
                 &lt;/div&gt;
                 
                 &lt;div style="margin-bottom: 1.5rem;"&gt;
                     &lt;label style="display: flex; align-items: flex-start; gap: 0.5rem;"&gt;
                         &lt;input type="checkbox" name="consent_public" value="1"&gt;
-                        &lt;span&gt;أوافق على عرض اسمي وتعليقي في القائمة العامة&lt;/span&gt;
+                        &lt;span&gt;I agree to display my name and comment in the public list&lt;/span&gt;
                     &lt;/label&gt;
                 &lt;/div&gt;
                 
                 &lt;button type="submit" style="background: #3498db; color: white; padding: 1rem 2rem; border: none; border-radius: 5px; width: 100%; cursor: pointer;"&gt;
-                    إرسال التوقيع
+                    Submit Signature
                 &lt;/button&gt;
                 
                 &lt;div id="form-message" style="margin-top: 1rem;"&gt;&lt;/div&gt;
@@ -200,7 +200,7 @@
         
         const button = form.querySelector('button');
         button.disabled = true;
-        button.textContent = 'جاري الإرسال...';
+        button.textContent = 'Submitting...';
         
         try {
             const formData = new FormData(form);
@@ -215,17 +215,17 @@
                 messageDiv.innerHTML = '&lt;div style="background: #d4edda; color: #155724; padding: 1rem; border-radius: 5px;"&gt;' + result.message + '&lt;/div&gt;';
                 form.reset();
             } else {
-                let errorMsg = 'حدث خطأ في الإرسال';
+                let errorMsg = 'An error occurred during submission';
                 if (result.errors) {
                     errorMsg += ': ' + Object.values(result.errors).join(', ');
                 }
                 messageDiv.innerHTML = '&lt;div style="background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 5px;"&gt;' + errorMsg + '&lt;/div&gt;';
             }
         } catch (error) {
-            messageDiv.innerHTML = '&lt;div style="background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 5px;"&gt;خطأ في الاتصال&lt;/div&gt;';
+            messageDiv.innerHTML = '&lt;div style="background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 5px;"&gt;Connection error&lt;/div&gt;';
         } finally {
             button.disabled = false;
-            button.textContent = 'إرسال التوقيع';
+            button.textContent = 'Submit Signature';
         }
     });
 })();
@@ -234,20 +234,20 @@
         </div>
 
         <div class="demo-section">
-            <h3>🚀 المعاينة المباشرة</h3>
-            <p>هذا مثال حي للويدجت (تأكد من تحديث رابط الـ Worker):</p>
+            <h3>🚀 Live Preview</h3>
+            <p>This is a live example of the widget (make sure to update the Worker URL):</p>
             
             <!-- Live Demo Widget -->
             <div id="live-demo-widget"></div>
         </div>
 
         <div class="demo-section">
-            <h3>⚙️ خيارات التخصيص</h3>
+            <h3>⚙️ Customization Options</h3>
             <ul>
-                <li><strong>الألوان:</strong> غير متغيرات CSS مثل <code>#3498db</code> للون الأزرار</li>
-                <li><strong>الخطوط:</strong> استبدل <code>Arial, sans-serif</code> بخط مختلف</li>
-                <li><strong>الحجم:</strong> عدّل <code>max-width: 600px</code> لتغيير عرض النموذج</li>
-                <li><strong>الرسائل:</strong> خصص نصوص الرسائل والتأكيدات</li>
+                <li><strong>Colors:</strong> Change CSS variables like <code>#3498db</code> for button colors</li>
+                <li><strong>Fonts:</strong> Replace <code>Arial, sans-serif</code> with a different font</li>
+                <li><strong>Size:</strong> Modify <code>max-width: 600px</code> to change form width</li>
+                <li><strong>Messages:</strong> Customize message texts and confirmations</li>
             </ul>
         </div>
     </div>
@@ -261,33 +261,33 @@
                 <div class="form-widget">
                     <form id="demo-form">
                         <div class="form-group">
-                            <label>الاسم الكامل *</label>
+                            <label>Full Name *</label>
                             <input type="text" name="name" required>
                         </div>
                         
                         <div class="form-group">
-                            <label>المؤسسة (اختياري)</label>
+                            <label>Organization (Optional)</label>
                             <input type="text" name="org">
                         </div>
                         
                         <div class="form-group">
-                            <label>البريد الإلكتروني *</label>
+                            <label>Email Address *</label>
                             <input type="email" name="email" required>
                         </div>
                         
                         <div class="form-group">
-                            <label>تعليق (اختياري)</label>
+                            <label>Comment (Optional)</label>
                             <textarea name="comment" rows="3"></textarea>
                         </div>
                         
                         <div class="form-group">
                             <div class="checkbox-group">
                                 <input type="checkbox" name="consent_public" value="1">
-                                <label>أوافق على عرض اسمي وتعليقي في القائمة العامة</label>
+                                <label>I agree to display my name and comment in the public list</label>
                             </div>
                         </div>
                         
-                        <button type="submit">إرسال التوقيع</button>
+                        <button type="submit">Submit Signature</button>
                         
                         <div id="demo-message"></div>
                     </form>
@@ -303,7 +303,7 @@
                 e.preventDefault();
                 
                 // Show demo message instead of actual submission
-                messageDiv.innerHTML = '<div class="message success">🎯 هذا مجرد مثال! استبدل رابط الـ Worker لتفعيل الإرسال الحقيقي.</div>';
+                messageDiv.innerHTML = '<div class="message success">🎯 This is just an example! Replace the Worker URL to enable real submissions.</div>';
                 
                 // Reset form after 3 seconds
                 setTimeout(() => {

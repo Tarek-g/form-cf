@@ -1,53 +1,53 @@
-# 📝 Form CF - مثال سريع للاستخدام
+# 📝 Form CF - Quick Usage Example
 
-## تجربة سريعة (3 دقائق)
+## Quick Test (3 minutes)
 
-### 1. النسخ والتثبيت
+### 1. Clone and install
 ```bash
 git clone https://github.com/YOUR-USERNAME/form-cf.git
 cd form-cf
 npm install
 ```
 
-### 2. إعداد Cloudflare
+### 2. Cloudflare setup
 ```bash
-# تسجيل دخول
+# Login
 npx wrangler login
 
-# إنشاء قاعدة بيانات
+# Create database
 npx wrangler d1 create form_db
 ```
 
-**انسخ `database_id` وضعه في `wrangler.toml`**
+**Copy `database_id` and put it in `wrangler.toml`**
 
-### 3. إعداد قاعدة البيانات
+### 3. Database setup
 ```bash
-# تطبيق المخطط
+# Apply schema
 npx wrangler d1 migrations apply form_db
 
-# التحقق
+# Verify
 npx wrangler d1 execute form_db --command="SELECT COUNT(*) FROM submissions;"
 ```
 
-### 4. النشر
+### 4. Deploy
 ```bash
 npm run deploy
 ```
 
-## 🎯 أمثلة سريعة للاستخدام
+## 🎯 Quick usage examples
 
-### تضمين بسيط
+### Simple embedding
 ```html
 <form action="https://YOUR-WORKER.workers.dev/api/submissions" method="post">
-    <input name="name" placeholder="الاسم" required>
-    <input name="email" placeholder="البريد" type="email" required>
-    <textarea name="comment" placeholder="تعليق"></textarea>
-    <label><input name="consent_public" type="checkbox" value="1"> عرض علني</label>
-    <button>إرسال</button>
+    <input name="name" placeholder="Name" required>
+    <input name="email" placeholder="Email" type="email" required>
+    <textarea name="comment" placeholder="Comment"></textarea>
+    <label><input name="consent_public" type="checkbox" value="1"> Public display</label>
+    <button>Submit</button>
 </form>
 ```
 
-### ويدجت JavaScript
+### JavaScript widget
 ```html
 <div id="form"></div>
 <script src="embed-code.js"></script>
@@ -56,38 +56,38 @@ FormCF.init('form', 'https://YOUR-WORKER.workers.dev');
 </script>
 ```
 
-### عرض التوقيعات
+### Display signatures
 ```javascript
 fetch('https://YOUR-WORKER.workers.dev/api/signatories')
     .then(res => res.json())
     .then(data => console.log(data.signatories));
 ```
 
-## 🔧 تخصيص سريع
+## 🔧 Quick customization
 
-### إضافة حقل جديد
-1. عدّل SQL في `migrations/`
-2. حدّث `validateSubmission()` في `worker.ts`
-3. أضف الحقل في HTML
+### Add new field
+1. Edit SQL in `migrations/`
+2. Update `validateSubmission()` in `worker.ts`
+3. Add field in HTML
 
-### تغيير التصميم
-- عدّل CSS في `embed-code.js`
-- أو استخدم الأمثلة في `public/examples/`
+### Change design
+- Edit CSS in `embed-code.js`
+- Or use examples in `public/examples/`
 
-## 📊 مراقبة
+## 📊 Monitoring
 
 ```bash
-# اللوجات المباشرة
+# Live logs
 npm run tail
 
-# الإحصائيات
+# Statistics
 curl https://YOUR-WORKER.workers.dev/api/stats
 
-# البيانات (للمشرف)
+# Data (for admin)
 curl -H "Authorization: Bearer YOUR-TOKEN" \
      https://YOUR-WORKER.workers.dev/api/submissions
 ```
 
 ---
 
-**🚀 جاهز في 3 دقائق!**
+**🚀 Ready in 3 minutes!**

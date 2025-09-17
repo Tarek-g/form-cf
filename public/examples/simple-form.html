@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نموذج تضمين بسيط - بدون JavaScript</title>
+    <title>Simple Embedded Form - Without JavaScript</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -78,10 +78,9 @@
 </head>
 <body>
     <div class="form-container">
-        <h2>📝 نموذج التوقيع</h2>
+        <h2>📝 Signature Form</h2>
         
         <!-- 
-            استبدل YOUR-WORKER-DOMAIN.workers.dev برابط الـ Worker الخاص بك
             Replace YOUR-WORKER-DOMAIN.workers.dev with your actual Worker URL
         -->
         <form action="https://YOUR-WORKER-DOMAIN.workers.dev/api/submissions" 
@@ -89,32 +88,32 @@
               accept-charset="utf-8">
             
             <div class="form-group">
-                <label for="name">الاسم الكامل *</label>
+                <label for="name">Full Name *</label>
                 <input type="text" id="name" name="name" required>
             </div>
             
             <div class="form-group">
-                <label for="org">المؤسسة أو الجهة (اختياري)</label>
+                <label for="org">Organization (Optional)</label>
                 <input type="text" id="org" name="org">
             </div>
             
             <div class="form-group">
-                <label for="email">البريد الإلكتروني *</label>
+                <label for="email">Email Address *</label>
                 <input type="email" id="email" name="email" required>
             </div>
             
             <div class="form-group">
-                <label for="comment">تعليق أو رسالة (اختياري)</label>
+                <label for="comment">Comment or Message (Optional)</label>
                 <textarea id="comment" name="comment" rows="4" 
-                          placeholder="شاركنا رأيك أو رسالتك..."></textarea>
+                          placeholder="Share your thoughts or message..."></textarea>
             </div>
             
             <div class="form-group">
                 <div class="checkbox-group">
                     <input type="checkbox" id="consent_public" name="consent_public" value="1">
                     <label for="consent_public">
-                        أوافق على عرض اسمي وتعليقي في القائمة العامة للموقعين. 
-                        (بريدك الإلكتروني لن يظهر أبداً للعامة)
+                        I agree to display my name and comment in the public signatories list. 
+                        (Your email address will never be shown publicly)
                     </label>
                 </div>
             </div>
@@ -124,23 +123,23 @@
                 <div class="cf-turnstile" 
                      data-sitekey="YOUR_TURNSTILE_SITE_KEY" 
                      data-theme="light" 
-                     data-language="ar"
+                     data-language="en"
                      data-callback="onTurnstileCallback"></div>
             </div>
             
-            <button type="submit">إرسال التوقيع</button>
+            <button type="submit">Submit Signature</button>
         </form>
         
         <div class="note">
-            📌 <strong>ملاحظة:</strong> هذا النموذج يعمل بدون JavaScript. 
-            بعد الإرسال، ستتم إعادة توجيهك لصفحة تأكيد.
+            📌 <strong>Note:</strong> This form works without JavaScript. 
+            After submission, you will be redirected to a confirmation page.
             <br><br>
-            <strong>التفعيل Turnstile CAPTCHA:</strong><br>
-            1. زر <a href="https://dash.cloudflare.com/" target="_blank">Cloudflare Dashboard</a><br>
-            2. اختر حسابك واذهب إلى "Turnstile"<br>
-            3. أضف موقع جديد واحصل على Site Key و Secret Key<br>
-            4. استبدل "YOUR_TURNSTILE_SITE_KEY" بالمفتاح العام<br>
-            5. أضف Secret Key في متغيرات البيئة
+            <strong>To enable Turnstile CAPTCHA:</strong><br>
+            1. Go to <a href="https://dash.cloudflare.com/" target="_blank">Cloudflare Dashboard</a><br>
+            2. Select your account and go to "Turnstile"<br>
+            3. Add a new site and get Site Key & Secret Key<br>
+            4. Replace "YOUR_TURNSTILE_SITE_KEY" with the public key<br>
+            5. Add Secret Key to environment variables
         </div>
     </div>
     

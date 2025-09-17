@@ -1,192 +1,192 @@
-# 🚀 دليل النشر - Form CF
+# 🚀 Deployment Guide - Form CF
 
-هذا الدليل يوضح كيفية نشر مشروع Form CF على Cloudflare Workers خطوة بخطوة.
+This guide explains how to deploy Form CF project on Cloudflare Workers step by step.
 
-## 📋 المتطلبات الأساسية
+## 📋 Prerequisites
 
-### 1. إنشاء حساب Cloudflare (مجاني)
-- اذهب إلى [cloudflare.com](https://cloudflare.com)
-- أنشئ حساب جديد أو سجل دخول
-- فعّل الحساب عبر البريد الإلكتروني
+### 1. Create Cloudflare account (free)
+- Go to [cloudflare.com](https://cloudflare.com)
+- Create new account or sign in
+- Activate account via email
 
-### 2. تثبيت Node.js
-- حمّل [Node.js](https://nodejs.org) الإصدار 18 أو أحدث
-- تحقق من التثبيت: `node --version`
+### 2. Install Node.js
+- Download [Node.js](https://nodejs.org) version 18 or newer
+- Verify installation: `node --version`
 
-### 3. تثبيت Git
-- حمّل [Git](https://git-scm.com)
-- تحقق من التثبيت: `git --version`
+### 3. Install Git
+- Download [Git](https://git-scm.com)
+- Verify installation: `git --version`
 
-## 🛠️ إعداد المشروع
+## 🛠️ Project setup
 
-### 1. استنساخ المشروع
+### 1. Clone the project
 ```bash
 git clone https://github.com/YOUR-USERNAME/form-cf.git
 cd form-cf
 ```
 
-### 2. تثبيت التبعيات
+### 2. Install dependencies
 ```bash
 npm install
 ```
 
-### 3. تسجيل الدخول في Wrangler
+### 3. Login to Wrangler
 ```bash
 npx wrangler login
 ```
-سيفتح المتصفح لتأكيد تسجيل الدخول.
+Browser will open to confirm login.
 
-## 🗄️ إعداد قاعدة البيانات D1
+## 🗄️ D1 Database setup
 
-### 1. إنشاء قاعدة البيانات
+### 1. Create database
 ```bash
 npx wrangler d1 create form_db
 ```
 
-**مهم:** احفظ `database_id` من النتيجة!
+**Important:** Save the `database_id` from the result!
 
-### 2. تحديث wrangler.toml
-افتح `wrangler.toml` وحدث:
+### 2. Update wrangler.toml
+Open `wrangler.toml` and update:
 ```toml
 [[d1_databases]]
 binding = "DB"
 database_name = "form_db"
-database_id = "YOUR-DATABASE-ID-HERE"  # ضع المعرف الصحيح هنا
+database_id = "YOUR-DATABASE-ID-HERE"  # Put the correct ID here
 ```
 
-### 3. تطبيق Migration
+### 3. Apply Migration
 ```bash
 npx wrangler d1 migrations apply form_db
 ```
 
-### 4. التحقق من إنشاء الجداول
+### 4. Verify table creation
 ```bash
 npx wrangler d1 execute form_db --command="SELECT name FROM sqlite_master WHERE type='table';"
 ```
 
-يجب أن ترى جدول `submissions`.
+You should see the `submissions` table.
 
-## 🔐 إعداد المتغيرات البيئية
+## 🔐 Environment variables setup
 
-### 1. تحديث الرموز السرية
-في `wrangler.toml`:
+### 1. Update secret tokens
+In `wrangler.toml`:
 ```toml
 [vars]
 ADMIN_BEARER = "your-super-secret-admin-token-2024-xyz"
 ALLOWED_ORIGINS = "https://yoursite.com,https://anotherdomain.com"
 ```
 
-⚠️ **مهم:** غيّر `ADMIN_BEARER` لرمز قوي وفريد!
+⚠️ **Important:** Change `ADMIN_BEARER` to a strong and unique token!
 
-### 2. إعدادات البيئات المختلفة
+### 2. Different environment settings
 ```toml
-# للإنتاج
+# For production
 [env.production]
 vars = { ENVIRONMENT = "production" }
 
-# للتطوير  
+# For development  
 [env.development]
 vars = { ENVIRONMENT = "development" }
 ```
 
-## 🚀 النشر
+## 🚀 Deployment
 
-### 1. النشر للإنتاج
+### 1. Deploy to production
 ```bash
 npm run deploy
 ```
 
-أو:
+Or:
 ```bash
 npx wrangler deploy
 ```
 
-### 2. نشر لبيئة معينة
+### 2. Deploy to specific environment
 ```bash
 npx wrangler deploy --env production
 ```
 
-### 3. النشر مع التطوير المحلي
+### 3. Deploy with local development
 ```bash
 npm run dev
 ```
 
-## ✅ التحقق من النشر
+## ✅ Verify deployment
 
-### 1. زيارة الموقع
-بعد النشر، ستحصل على رابط مثل:
+### 1. Visit the website
+After deployment, you'll get a URL like:
 ```
 https://form-cf.YOUR-SUBDOMAIN.workers.dev
 ```
 
-### 2. اختبار النقاط النهائية
+### 2. Test endpoints
 
-**الصفحة الرئيسية:**
+**Home page:**
 ```
 GET https://your-worker.workers.dev/
 ```
 
-**إرسال نموذج:**
+**Submit form:**
 ```bash
 curl -X POST https://your-worker.workers.dev/api/submissions \
   -d "name=Test User&email=test@example.com&consent_public=1"
 ```
 
-**عرض التوقيعات:**
+**View signatures:**
 ```bash
 curl https://your-worker.workers.dev/api/signatories
 ```
 
-**الإحصائيات:**
+**Statistics:**
 ```bash
 curl https://your-worker.workers.dev/api/stats
 ```
 
-**عرض البيانات (للمشرف):**
+**View data (admin):**
 ```bash
 curl -H "Authorization: Bearer your-admin-token" \
   https://your-worker.workers.dev/api/submissions
 ```
 
-## 🔧 إدارة المشروع
+## 🔧 Project management
 
-### 1. مراقبة اللوجات المباشرة
+### 1. Monitor live logs
 ```bash
 npm run tail
 ```
 
-### 2. إعادة النشر
+### 2. Redeploy
 ```bash
 npm run deploy
 ```
 
-### 3. تحديث قاعدة البيانات
+### 3. Update database
 ```bash
-# إضافة migration جديد
+# Add new migration
 npx wrangler d1 migrations create add_new_field
 
-# تطبيق migrations جديدة
+# Apply new migrations
 npx wrangler d1 migrations apply form_db
 ```
 
-### 4. نسخ احتياطية
+### 4. Backups
 ```bash
-# تصدير كامل
+# Full export
 npx wrangler d1 execute form_db --command=".dump" > backup-$(date +%Y%m%d).sql
 
-# تصدير البيانات فقط
+# Data only export
 npx wrangler d1 execute form_db --command="SELECT * FROM submissions;" --format=table > submissions-backup.txt
 ```
 
-## 🌐 ربط نطاق مخصص
+## 🌐 Connect custom domain
 
-### 1. إضافة النطاق في Cloudflare
-- اذهب إلى Cloudflare Dashboard
-- أضف موقعك (Add Site)
-- اتبع التعليمات لتحديث DNS
+### 1. Add domain in Cloudflare
+- Go to Cloudflare Dashboard
+- Add your site (Add Site)
+- Follow instructions to update DNS
 
-### 2. ربط Worker بالنطاق
-في `wrangler.toml`:
+### 2. Connect Worker to domain
+In `wrangler.toml`:
 ```toml
 [env.production]
 routes = [
@@ -194,84 +194,84 @@ routes = [
 ]
 ```
 
-أو من الـ Dashboard:
+Or from Dashboard:
 - Workers & Pages → form-cf → Settings → Triggers
-- أضف Custom Domain
+- Add Custom Domain
 
-## 📊 مراقبة الأداء
+## 📊 Performance monitoring
 
 ### 1. Cloudflare Analytics
-- اذهب إلى Workers & Pages
-- اختر `form-cf`
-- اطلع على إحصائيات الاستخدام
+- Go to Workers & Pages
+- Select `form-cf`
+- View usage statistics
 
-### 2. تنبيهات الحدود
-- اذهب إلى Notifications
-- أضف تنبيه عند الوصول لحد معين من الطلبات
+### 2. Limit alerts
+- Go to Notifications
+- Add alert when reaching certain request limit
 
-## 🔒 الأمان والصيانة
+## 🔒 Security and maintenance
 
-### 1. تحديث الرموز السرية دورياً
+### 1. Update secret tokens regularly
 ```bash
-# تحديث ADMIN_BEARER في wrangler.toml
-# ثم إعادة النشر
+# Update ADMIN_BEARER in wrangler.toml
+# Then redeploy
 npm run deploy
 ```
 
-### 2. مراجعة السجلات
+### 2. Review logs
 ```bash
 npm run tail
 ```
 
-### 3. تحديث التبعيات
+### 3. Update dependencies
 ```bash
 npm update
 ```
 
-## 🐛 حل المشاكل الشائعة
+## 🐛 Common issues troubleshooting
 
-### خطأ "Database not found"
+### "Database not found" error
 ```bash
-# تأكد من صحة database_id في wrangler.toml
+# Make sure database_id is correct in wrangler.toml
 npx wrangler d1 list
 ```
 
-### خطأ "Unauthorized"
-- تحقق من `ADMIN_BEARER` في `wrangler.toml`
-- تأكد من إعادة النشر بعد التحديث
+### "Unauthorized" error
+- Check `ADMIN_BEARER` in `wrangler.toml`
+- Make sure to redeploy after update
 
-### خطأ CORS
-- أضف نطاقك في `ALLOWED_ORIGINS`
-- أعد النشر
+### CORS error
+- Add your domain in `ALLOWED_ORIGINS`
+- Redeploy
 
-### بطء الاستجابة
-- تحقق من Cloudflare Analytics
-- راجع تحسين الاستعلامات في `worker.ts`
+### Slow response
+- Check Cloudflare Analytics
+- Review query optimization in `worker.ts`
 
-## 💰 تقدير التكلفة
+## 💰 Cost estimation
 
-### Cloudflare Workers (مجاني حتى 100,000 طلب/يوم)
-- **الطبقة المجانية:** 100,000 طلب يومياً
-- **الدفع حسب الاستخدام:** $0.50 لكل مليون طلب إضافي
+### Cloudflare Workers (free up to 100,000 requests/day)
+- **Free tier:** 100,000 daily requests
+- **Pay as you go:** $0.50 per million additional requests
 
-### D1 Database (مجاني حتى 5GB)
-- **التخزين:** مجاني حتى 5GB
-- **القراءة:** 25 مليون طلب/شهر مجاناً
-- **الكتابة:** 50,000 عملية/يوم مجاناً
+### D1 Database (free up to 5GB)
+- **Storage:** Free up to 5GB
+- **Reads:** 25 million requests/month free
+- **Writes:** 50,000 operations/day free
 
-### تقدير للاستخدام المتوسط
-- **موقع صغير (100 إرسال/يوم):** مجاني تماماً
-- **موقع متوسط (1000 إرسال/يوم):** مجاني تماماً  
-- **موقع كبير (10,000 إرسال/يوم):** حوالي $1-2/شهر
+### Estimate for average usage
+- **Small site (100 submissions/day):** Completely free
+- **Medium site (1000 submissions/day):** Completely free  
+- **Large site (10,000 submissions/day):** About $1-2/month
 
-## 📞 الدعم الفني
+## 📞 Technical support
 
-إذا واجهت مشاكل:
+If you encounter issues:
 
-1. **راجع اللوجات:** `npm run tail`
-2. **تحقق من التوثيق:** [Cloudflare Workers Docs](https://developers.cloudflare.com/workers/)
-3. **افتح issue:** في [GitHub Repository](https://github.com/YOUR-USERNAME/form-cf/issues)
+1. **Check logs:** `npm run tail`
+2. **Check documentation:** [Cloudflare Workers Docs](https://developers.cloudflare.com/workers/)
+3. **Open issue:** In [GitHub Repository](https://github.com/YOUR-USERNAME/form-cf/issues)
 
 ---
 
-🎉 **تهانينا! مشروعك الآن جاهز ومنشور!** 🎉
+🎉 **Congratulations! Your project is now ready and deployed!** 🎉

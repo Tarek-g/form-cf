@@ -1,5 +1,4 @@
 /**
- * نظام استمارات بسيط على Cloudflare Workers مع D1
  * Simple form system on Cloudflare Workers with D1
  */
 
@@ -152,16 +151,16 @@ function validateSubmission(payload: any) {
   
   // Enhanced validation rules
   if (!name) {
-    errors.name = "الاسم مطلوب";
+    errors.name = "Name is required";
   } else if (name.length < 2) {
-    errors.name = "الاسم يجب أن يكون أكثر من حرف واحد";
+    errors.name = "Name must be more than one character";
   } else if (name.length > 100) {
-    errors.name = "الاسم طويل جداً (الحد الأقصى 100 حرف)";
+    errors.name = "Name is too long (maximum 100 characters)";
   }
   
   // More comprehensive email validation
   if (!email) {
-    errors.email = "البريد الإلكتروني مطلوب";
+    errors.email = "Email is required";
   } else {
     // Enhanced email regex that supports international domains
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -170,16 +169,16 @@ function validateSubmission(payload: any) {
     const hasValidParts = email.includes('@') && email.includes('.') && !email.startsWith('.') && !email.endsWith('.');
     
     if (!isValidFormat || !hasValidLength || !hasValidParts) {
-      errors.email = "بريد إلكتروني غير صالح";
+      errors.email = "Invalid email address";
     }
   }
   
   if (org && org.length > 200) {
-    errors.org = "اسم المؤسسة طويل جداً (الحد الأقصى 200 حرف)";
+    errors.org = "Organization name is too long (maximum 200 characters)";
   }
   
   if (comment && comment.length > 1000) {
-    errors.comment = "التعليق طويل جداً (الحد الأقصى 1000 حرف)";
+    errors.comment = "Comment is too long (maximum 1000 characters)";
   }
   
   const consent_public = consent === "1" || consent === "true" || consent === "on";
@@ -266,7 +265,7 @@ export default {
           
           if (!turnstileValid) {
             return jsonResponse(
-              { success: false, errors: { turnstile: "فشل التحقق من الأمان. حاول مرة أخرى." } }, 
+              { success: false, errors: { turnstile: "Security verification failed. Please try again." } }, 
               { status: 400, headers: corsHeaders }
             );
           }
@@ -297,7 +296,7 @@ export default {
         
         if (existingSubmission) {
           return jsonResponse(
-            { success: false, errors: { email: "هذا البريد الإلكتروني مسجل مسبقاً" } }, 
+            { success: false, errors: { email: "This email address is already registered" } }, 
             { status: 400, headers: corsHeaders }
           );
         }
@@ -322,14 +321,14 @@ export default {
           { 
             success: true, 
             id, 
-            message: "تم إرسال النموذج بنجاح. شكراً لك!" 
+            message: "Form submitted successfully. Thank you!" 
           }, 
           { status: 201, headers: corsHeaders }
         );
         } catch (submitError) {
           console.error('Error in form submission:', submitError);
           return jsonResponse(
-            { success: false, error: "خطأ في معالجة النموذج" }, 
+            { success: false, error: "Form processing error" }, 
             { status: 500, headers: corsHeaders }
           );
         }
@@ -382,7 +381,7 @@ export default {
         
         if (!auth.startsWith("Bearer ") || auth.slice(7) !== env.ADMIN_BEARER) {
           return jsonResponse(
-            { success: false, error: "غير مخول للوصول" }, 
+            { success: false, error: "Unauthorized access" }, 
             { status: 401, headers: corsHeaders }
           );
         }
@@ -466,14 +465,14 @@ export default {
       
       // 404 for other routes
       return jsonResponse(
-        { success: false, error: "المسار غير موجود" }, 
+        { success: false, error: "Route not found" }, 
         { status: 404, headers: corsHeaders }
       );
       
     } catch (error) {
       console.error("Worker error:", error);
       return jsonResponse(
-        { success: false, error: "خطأ في الخادم" }, 
+        { success: false, error: "Server error" }, 
         { status: 500, headers: corsHeaders }
       );
     }
@@ -483,11 +482,11 @@ export default {
 // HTML home page with embedded form
 function getHomePage(): string {
   return `<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام الاستمارات - Form CF</title>
+    <title>Form System - Form CF</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -606,35 +605,35 @@ function getHomePage(): string {
 </head>
 <body>
     <div class="container">
-        <h1>🖊️ نظام الاستمارات البسيط</h1>
+        <h1>🖊️ Simple Form System</h1>
         
         <form id="signForm">
             <div class="form-group">
-                <label for="name">الاسم الكامل *</label>
+                <label for="name">Full Name *</label>
                 <input type="text" id="name" name="name" required>
             </div>
             
             <div class="form-group">
-                <label for="org">المؤسسة أو الجهة (اختياري)</label>
+                <label for="org">Organization (Optional)</label>
                 <input type="text" id="org" name="org">
             </div>
             
             <div class="form-group">
-                <label for="email">البريد الإلكتروني *</label>
+                <label for="email">Email Address *</label>
                 <input type="email" id="email" name="email" required>
             </div>
             
             <div class="form-group">
-                <label for="comment">تعليق أو رسالة (اختياري)</label>
-                <textarea id="comment" name="comment" rows="4" placeholder="شاركنا رأيك أو رسالتك..."></textarea>
+                <label for="comment">Comment or Message (Optional)</label>
+                <textarea id="comment" name="comment" rows="4" placeholder="Share your thoughts or message..."></textarea>
             </div>
             
             <div class="form-group">
                 <div class="checkbox-group">
                     <input type="checkbox" id="consent_public" name="consent_public" value="1">
                     <label for="consent_public">
-                        أوافق على عرض اسمي وتعليقي في القائمة العامة للموقعين. 
-                        (بريدك الإلكتروني لن يظهر أبداً للعامة)
+                        I agree to display my name and comment in the public signatories list. 
+                        (Your email address will never be shown publicly)
                     </label>
                 </div>
             </div>
@@ -644,18 +643,18 @@ function getHomePage(): string {
                 <div class="cf-turnstile" data-sitekey="TURNSTILE_SITE_KEY" data-theme="light" data-language="ar"></div>
             </div>
             
-            <button type="submit">إرسال التوقيع</button>
+            <button type="submit">Submit Signature</button>
         </form>
         
         <div id="message"></div>
         
         <div class="stats">
-            <div id="stats-content">جاري تحميل الإحصائيات...</div>
+            <div id="stats-content">Loading statistics...</div>
         </div>
         
         <div class="signatures">
-            <h2>آخر التوقيعات العامة</h2>
-            <div id="signatures-list">جاري تحميل التوقيعات...</div>
+            <h2>Latest Public Signatures</h2>
+            <div id="signatures-list">Loading signatures...</div>
         </div>
     </div>
 
@@ -687,7 +686,7 @@ function getHomePage(): string {
             
             const submitButton = form.querySelector('button[type="submit"]');
             submitButton.disabled = true;
-            submitButton.textContent = 'جاري الإرسال...';
+            submitButton.textContent = 'Submitting...';
             
             try {
                 const formData = new FormData(form);
@@ -723,7 +722,7 @@ function getHomePage(): string {
                         loadSignatures();
                     }, 1000);
                 } else {
-                    let errorMsg = 'حدث خطأ في الإرسال:';
+                    let errorMsg = 'An error occurred during submission:';
                     if (result.errors) {
                         errorMsg += '<br>' + Object.values(result.errors).join('<br>');
                     }
@@ -735,7 +734,7 @@ function getHomePage(): string {
                     }
                 }
             } catch (error) {
-                showMessage('خطأ في الاتصال. حاول مرة أخرى.', 'error');
+                showMessage('Connection error. Please try again.', 'error');
                 
                 // Reset Turnstile on error
                 const turnstileElement = document.querySelector('.cf-turnstile');
@@ -744,7 +743,7 @@ function getHomePage(): string {
                 }
             } finally {
                 submitButton.disabled = false;
-                submitButton.textContent = 'إرسال التوقيع';
+                submitButton.textContent = 'Submit Signature';
             }
         });
         
@@ -768,11 +767,11 @@ function getHomePage(): string {
                 
                 if (result.success) {
                     document.getElementById('stats-content').innerHTML = 
-                        \`📊 إجمالي المشاركات: <strong>\${result.total_submissions}</strong> | 
-                        التوقيعات العامة: <strong>\${result.public_signatures}</strong>\`;
+                        \`📊 Total Submissions: <strong>\${result.total_submissions}</strong> | 
+                        Public Signatures: <strong>\${result.public_signatures}</strong>\`;
                 }
             } catch (error) {
-                document.getElementById('stats-content').textContent = 'خطأ في تحميل الإحصائيات';
+                document.getElementById('stats-content').textContent = 'Error loading statistics';
             }
         }
         
@@ -793,11 +792,11 @@ function getHomePage(): string {
                     document.getElementById('signatures-list').innerHTML = signaturesHtml;
                 } else {
                     document.getElementById('signatures-list').innerHTML = 
-                        '<p style="text-align: center; color: #666;">لا توجد توقيعات عامة بعد</p>';
+                        '<p style="text-align: center; color: #666;">No public signatures yet</p>';
                 }
             } catch (error) {
                 document.getElementById('signatures-list').innerHTML = 
-                    '<p style="text-align: center; color: #666;">خطأ في تحميل التوقيعات</p>';
+                    '<p style="text-align: center; color: #666;">Error loading signatures</p>';
             }
         }
         

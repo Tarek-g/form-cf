@@ -1,7 +1,7 @@
 {
   "name": "form-cf",
   "version": "1.0.0",
-  "description": "نظام استمارات بسيط ورخيص على Cloudflare Workers مع D1",
+  "description": "Simple and affordable form system on Cloudflare Workers with D1",
   "main": "src/worker.ts",
   "scripts": {
     "dev": "wrangler dev",

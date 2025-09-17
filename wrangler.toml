@@ -9,20 +9,20 @@ database_name = "form_db"
 database_id = "d00a4582-02b8-461e-9d96-7360f2f965de"
 
 [vars]
-# غير كلمة المرور هذه لشيء سري وقوي
+# Change this password to something secret and strong
 ADMIN_BEARER = "change_me_very_secret_admin_token_123"
-# أضف النطاقات المسموحة (فاصلة بينها)
+# Add allowed domains (comma separated)
 ALLOWED_ORIGINS = "https://alghorani.me,https://cihrs.org,http://localhost:3000"
-# إعداد Turnstile (اختياري) - احصل على المفاتيح من لوحة تحكم Cloudflare
+# Turnstile setup (optional) - get keys from Cloudflare dashboard
 # TURNSTILE_SECRET_KEY = "your_turnstile_secret_key_here"
-# مفاتيح التشفير (مطلوبة) - لا تغيرها إلا إذا كنت تعرف ما تفعل
+# Encryption keys (required) - don't change unless you know what you're doing
 ENC_KEY_B64 = "O7Nrr0qEe+4UznoAwa+9HzUbw20I86eAET2pZmLUJvg="
 ENC_KEY_ID = "default-key-2024"
 
-# إعدادات الإنتاج
+# Production settings
 [env.production]
 vars = { ENVIRONMENT = "production" }
 
-# إعدادات التطوير
+# Development settings
 [env.development]
 vars = { ENVIRONMENT = "development" }
