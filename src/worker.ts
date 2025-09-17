@@ -8,6 +8,8 @@ export interface Env {
   ADMIN_BEARER: string;
   ALLOWED_ORIGINS?: string;
   ENVIRONMENT?: string;
+  ENC_KEY_B64: string;  // Base64 encoded AES-256 key
+  ENC_KEY_ID: string;   // Key identifier for rotation
 }
 
 interface FormValidationResult {
@@ -20,6 +22,48 @@ interface FormValidationResult {
     comment: string;
     consent_public: boolean;
   };
+}
+
+// Encryption helpers for AES-GCM
+const te = new TextEncoder();
+const td = new TextDecoder();
+
+function base64Encode(data: Uint8Array): string {
+  return btoa(String.fromCharCode(...data));
+}
+
+function base64Decode(base64: string): Uint8Array {
+  return Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+}
+
+async function importKey(base64Key: string): Promise<CryptoKey> {
+  const keyData = base64Decode(base64Key);
+  return crypto.subtle.importKey("raw", keyData, "AES-GCM", false, ["encrypt", "decrypt"]);
+}
+
+async function encryptJSON(obj: unknown, key: CryptoKey): Promise<{iv: string, ct: string}> {
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const plaintext = te.encode(JSON.stringify(obj));
+  const ciphertext = await crypto.subtle.encrypt({name: "AES-GCM", iv}, key, plaintext);
+  return {
+    iv: base64Encode(iv),
+    ct: base64Encode(new Uint8Array(ciphertext))
+  };
+}
+
+async function decryptJSON(ctBase64: string, ivBase64: string, key: CryptoKey): Promise<any> {
+  const iv = base64Decode(ivBase64);
+  const ciphertext = base64Decode(ctBase64);
+  const plaintext = await crypto.subtle.decrypt({name: "AES-GCM", iv}, key, ciphertext);
+  return JSON.parse(td.decode(plaintext));
+}
+
+async function hashEmail(email: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(email.toLowerCase().trim());
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 }
 
 // CORS headers helper
@@ -141,17 +185,40 @@ export default {
         const ua = request.headers.get("User-Agent") || "";
         const ip_hash = await hashIP(ip);
         
-        // Insert into database
+        // Encrypt PII data
+        const key = await importKey(env.ENC_KEY_B64);
+        const pii = {
+          name: data.name,
+          org: data.org,
+          email: data.email,
+          comment: data.comment
+        };
+        const { ct, iv } = await encryptJSON(pii, key);
+        const email_sha256 = await hashEmail(data.email);
+        
+        // Check for duplicate email (using hash)
+        const existingSubmission = await env.DB.prepare(
+          `SELECT id FROM submissions WHERE email_sha256 = ? LIMIT 1`
+        ).bind(email_sha256).first();
+        
+        if (existingSubmission) {
+          return jsonResponse(
+            { success: false, errors: { email: "هذا البريد الإلكتروني مسجل مسبقاً" } }, 
+            { status: 400, headers: corsHeaders }
+          );
+        }
+        
+        // Insert encrypted data into database
         await env.DB.prepare(
-          `INSERT INTO submissions (id, created_at, name, org, email, comment, consent_public, ip_hash, ua)
+          `INSERT INTO submissions (id, created_at, pii_ct, iv, key_id, email_sha256, consent_public, ip_hash, ua)
            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
         ).bind(
           id, 
           created_at, 
-          data.name, 
-          data.org, 
-          data.email, 
-          data.comment, 
+          ct,
+          iv,
+          env.ENC_KEY_ID,
+          email_sha256,
           data.consent_public ? 1 : 0, 
           ip_hash, 
           ua
@@ -169,19 +236,40 @@ export default {
       
       // GET /api/signatories - Public list (only consented submissions)
       if (url.pathname === "/api/signatories" && request.method === "GET") {
+        const key = await importKey(env.ENC_KEY_B64);
         const { results } = await env.DB.prepare(
-          `SELECT name, org, comment, created_at 
+          `SELECT pii_ct, iv, consent_public, created_at 
            FROM submissions 
-           WHERE consent_public = 1 
+           WHERE consent_public = 1 AND pii_ct IS NOT NULL
            ORDER BY created_at DESC 
            LIMIT 500`
         ).all();
         
+        const signatories = await Promise.all(
+          (results || []).map(async (row: any) => {
+            try {
+              const pii = await decryptJSON(row.pii_ct, row.iv, key);
+              return {
+                name: pii.name,
+                org: pii.org,
+                comment: pii.comment,
+                created_at: row.created_at
+              };
+            } catch (error) {
+              console.error('Failed to decrypt PII for signatory:', error);
+              return null;
+            }
+          })
+        );
+        
+        // Filter out any failed decryptions
+        const validSignatories = signatories.filter(item => item !== null);
+        
         return jsonResponse(
           { 
             success: true, 
-            count: results?.length || 0,
-            signatories: results || [] 
+            count: validSignatories.length,
+            signatories: validSignatories
           }, 
           { headers: corsHeaders }
         );
@@ -198,18 +286,47 @@ export default {
           );
         }
         
+        const key = await importKey(env.ENC_KEY_B64);
         const { results } = await env.DB.prepare(
-          `SELECT id, created_at, name, org, email, comment, consent_public, ip_hash
+          `SELECT id, created_at, pii_ct, iv, key_id, consent_public, ip_hash, email_sha256
            FROM submissions 
            ORDER BY created_at DESC 
            LIMIT 1000`
         ).all();
         
+        const submissions = await Promise.all(
+          (results || []).map(async (row: any) => {
+            let decryptedData = null;
+            
+            // Try to decrypt if we have encrypted data
+            if (row.pii_ct && row.iv) {
+              try {
+                decryptedData = await decryptJSON(row.pii_ct, row.iv, key);
+              } catch (error) {
+                console.error('Failed to decrypt PII for admin view:', error);
+              }
+            }
+            
+            return {
+              id: row.id,
+              created_at: row.created_at,
+              name: decryptedData?.name || '[ENCRYPTED]',
+              org: decryptedData?.org || '[ENCRYPTED]',
+              email: decryptedData?.email || '[ENCRYPTED]',
+              comment: decryptedData?.comment || '[ENCRYPTED]',
+              consent_public: row.consent_public,
+              ip_hash: row.ip_hash,
+              key_id: row.key_id,
+              email_sha256: row.email_sha256
+            };
+          })
+        );
+        
         return jsonResponse(
           { 
             success: true, 
-            count: results?.length || 0,
-            submissions: results || [] 
+            count: submissions.length,
+            submissions: submissions
           }, 
           { headers: corsHeaders }
         );
